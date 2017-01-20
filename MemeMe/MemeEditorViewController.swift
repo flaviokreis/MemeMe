@@ -8,7 +8,7 @@
 
 import UIKit
 
-class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavigationControllerDelegate, UITextFieldDelegate {
+class MemeEditorViewController: UIViewController, UIImagePickerControllerDelegate, UINavigationControllerDelegate, UITextFieldDelegate {
 
     @IBOutlet weak var imageView: UIImageView!
     @IBOutlet weak var cameraPickButton: UIBarButtonItem!
@@ -17,13 +17,6 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavig
     @IBOutlet weak var bottomTextField: UITextField!
     @IBOutlet weak var topBar: UIToolbar!
     @IBOutlet weak var bottomBar: UIToolbar!
-    
-    let memeTextAttributes = [
-        NSStrokeColorAttributeName : UIColor.black,
-        NSForegroundColorAttributeName : UIColor.white,
-        NSFontAttributeName : UIFont(name: "HelveticaNeue-CondensedBlack", size: 40)!,
-        NSStrokeWidthAttributeName : -1.0
-    ] as [String : Any]
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -35,7 +28,18 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavig
         shareButton.isEnabled = false
     }
     
+    override var prefersStatusBarHidden: Bool{
+        return true
+    }
+    
     private func setupTextField(_ field: UITextField) {
+        let memeTextAttributes = [
+            NSStrokeColorAttributeName : UIColor.black,
+            NSForegroundColorAttributeName : UIColor.white,
+            NSFontAttributeName : UIFont(name: "HelveticaNeue-CondensedBlack", size: 40)!,
+            NSStrokeWidthAttributeName : -1.0
+            ] as [String : Any]
+        
         field.defaultTextAttributes = memeTextAttributes
         field.delegate = self
         field.textAlignment = .center
@@ -53,7 +57,7 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavig
     }
     
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
-        self.view.endEditing(true)
+        view.endEditing(true)
     }
     
     //MARK: Select images
@@ -101,7 +105,9 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavig
         let activityViewController = UIActivityViewController(activityItems: [memedImage], applicationActivities: nil)
         
         activityViewController.completionWithItemsHandler = { activity, success, items, error in
-            self.save(memedImage: memedImage)
+            if success {
+                self.save(memedImage: memedImage)
+            }
         }
         
         self.present(activityViewController, animated: true, completion: nil)
@@ -141,14 +147,12 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavig
     
     func keyboardWillShow(_ notification:Notification) {
         if bottomTextField.isFirstResponder{
-            view.frame.origin.y = 0 - getKeyboardHeight(notification)
+            view.frame.origin.y = -getKeyboardHeight(notification)
         }
     }
     
     func keyboardWillHide(_ notification:Notification) {
-        if bottomTextField.isFirstResponder{
-            view.frame.origin.y = 0
-        }
+        view.frame.origin.y = 0
     }
     
     func getKeyboardHeight(_ notification:Notification) -> CGFloat {
