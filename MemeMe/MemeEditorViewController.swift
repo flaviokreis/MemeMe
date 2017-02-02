@@ -56,6 +56,10 @@ class MemeEditorViewController: UIViewController, UIImagePickerControllerDelegat
         unsubscribeFromKeyboardNotifications()
     }
     
+    @IBAction func cancelEditMeme(_ sender: Any) {
+        self.dismiss(animated: true)
+    }
+    
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
         view.endEditing(true)
     }
@@ -107,6 +111,8 @@ class MemeEditorViewController: UIViewController, UIImagePickerControllerDelegat
         activityViewController.completionWithItemsHandler = { activity, success, items, error in
             if success {
                 self.save(memedImage: memedImage)
+                
+                self.dismiss(animated: true)
             }
         }
         
@@ -117,6 +123,10 @@ class MemeEditorViewController: UIViewController, UIImagePickerControllerDelegat
         // Create the meme
         let meme = Meme(topText: topTextField.text!, bottomText: bottomTextField.text!,
                         originalImage: imageView.image!, memedImage: memedImage)
+        
+        // Add it to the memes array in the Application Delegate
+        let appDelegate = UIApplication.shared.delegate as! AppDelegate
+        appDelegate.memes.append(meme)
     }
     
     func generateMemedImage() -> UIImage {
